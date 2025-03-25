@@ -37,8 +37,10 @@ void newton(double, const std::function<double(double)> &, const std::function<d
 void secant(double, double, const std::function<double(double)> &);
 
 int main() {
-    picard(function_tanh, phi_tanh);
-    picard(function_sinh, phi_sinh);
+    // picard(function_tanh, phi_tanh);
+    // picard(function_sinh, phi_sinh);
+    bisection(0.0, 2.0, function_tanh);
+    bisection(0.0, 2.0, function_sinh);
     return 0;
 }
 
@@ -70,7 +72,7 @@ void picard(const std::function<double(double)> &f, const std::function<double(d
 
         std::printf("%-3d %-10.12f   %-10.12f   %-10.12f\n", i, x_1, estimator, residuum);
 
-        if (estimator < TOLX || residuum < TOLF || std::fabs(x_1) > 1.0) break;
+        if (std::fabs(x_1) > 1.0 || estimator < TOLX || residuum < TOLF) break;
 
         x_0 = x_1;
     }
@@ -78,4 +80,20 @@ void picard(const std::function<double(double)> &f, const std::function<double(d
 }
 
 void bisection(double a, double b, const std::function<double(double)> &f) {
+    std::cout << "---------------------- Bisekcja ----------------------" << std::endl;
+    std::printf("%-5s%-17s%-17s%-17s\n", "i", "Wartosc", "Estymator", "Residuum");
+    double x_n;
+    for (int i = 1; i <= ITERATIONS; i++) {
+        x_n = (a + b) / 2.0;
+        const double estimator = std::fabs(b - a) / 2.0;
+        const double residuum = std::fabs(f(x_n));
+
+        std::printf("%-3d %-10.12f   %-10.12f   %-10.12f\n", i, x_n, estimator, residuum);
+
+        if (estimator < TOLX || residuum < TOLF) break;
+
+        if (f(a) * f(x_n) < 0) b = x_n;
+        else a = x_n;
+    }
+    std::cout << std::endl;
 }
