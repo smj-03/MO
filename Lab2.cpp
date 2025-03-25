@@ -50,8 +50,7 @@ int main() {
     std::ifstream input("../data/dane_do_laboratorium_2.txt");
     std::ofstream output_1("../results/wyniki_1_lab_2.txt");
     std::ofstream output_2("../results/wyniki_2_lab_2.txt");
-    std::ofstream output_3("../results/wyniki_3_lab_2.txt");
-    if (!input || !output_1 || !output_2 || !output_3) {
+    if (!input || !output_1 || !output_2) {
         std::cerr << "Error: Blad przy otwieraniu pliku!" << std::endl;
         return 1;
     }
@@ -74,7 +73,6 @@ int main() {
     input.close();
     output_1.close();
     output_2.close();
-    output_3.close();
 
     return 0;
 }
