@@ -1,0 +1,18 @@
+{
+	"bmi-installation" : null,
+	"compiler-frontend-variant" : "GNU",
+	"compiler-id" : "GNU",
+	"compiler-simulate-id" : "",
+	"config" : "Debug",
+	"cxx-modules" : {},
+	"dir-cur-bld" : "C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/cmake-build-debug",
+	"dir-cur-src" : "C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1",
+	"dir-top-bld" : "C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/cmake-build-debug",
+	"dir-top-src" : "C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1",
+	"exports" : [],
+	"forward-modules-from-target-dirs" : [],
+	"include-dirs" : [],
+	"language" : "CXX",
+	"linked-target-dirs" : [],
+	"module-dir" : "C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/cmake-build-debug/CMakeFiles/Metody_Obliczeniowe.dir"
+}

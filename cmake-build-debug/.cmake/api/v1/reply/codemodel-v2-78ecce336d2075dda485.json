@@ -1,0 +1,87 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.30"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Metody_Obliczeniowe",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Lab1::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Lab1-Debug-ee8f5b583d8f6dcb187e.json",
+					"name" : "Lab1",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Lab2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Lab2-Debug-143b0d595b375803eb6c.json",
+					"name" : "Lab2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Lab3::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Lab3-Debug-75559e4a3f1439f8ad65.json",
+					"name" : "Lab3",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Lab4::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Lab4-Debug-50e2d9f0f0cc311ee190.json",
+					"name" : "Lab4",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/cmake-build-debug",
+		"source" : "C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
