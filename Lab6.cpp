@@ -15,3 +15,6 @@
 * Uwaga: ponieważ macierz trój-diagonalna jest macierzą rzadką, więc w programie
 * NIE NALEŻY używać tablic kwadratowych do reprezentacji macierzy A.
 */
+
+// Notatki
+// Macierz A w postaci 3 wektorów z przekątnymi

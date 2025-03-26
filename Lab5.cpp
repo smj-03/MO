@@ -17,9 +17,6 @@
 * procedury pierwszej.
 */
 
+// Notatki
 // Nie używać A[i][j], zastosować pomocniczy wektor index[i]=i
 // A[index[i][j], b[index[i]][j]
-
-// Created by szymon.chwastek on 3/26/2025.
-// 5.2 Metoda Wyznaczników
-// 6 3 tablice przechowujace przekatne

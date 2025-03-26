@@ -7,6 +7,7 @@
 * związek E z precyzją arytmetyki.
 */
 
+// Notatki
 // Epsylon maszynowy - Rożnica pomiędzy 1, a następną dostępną liczbą.
 // E = x+ - x-, Zakładając, że x- = 1
 // E = 2 * v = 2 * 2^[-1 * (t+1)] = 2^(-t)

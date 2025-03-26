@@ -11,3 +11,6 @@
 * Porównaj rozwiązania numeryczne z analitycznym, i wyjaśnij ewentualne obserwowane zmiany
 * błędu rozwiązań numerycznych.
 */
+
+// Notatki
+// Np. metoda wyznaczników

@@ -15,6 +15,14 @@
 * programu GNUPLOT (dostępnego za darmo z Internetu).
 */
 
+// Notatki
+/*
+plot \
+"C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/results/wyniki_1_lab_2.txt" using 1:2 with lines title "log10(x) od log10(error)", \
+"C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/results/wyniki_2_lab_2.txt" using 1:2 with lines title "log10(x) od log10(alt_error)", \
+-16 with lines lc rgb "red" title "Blad reprezentacji"
+*/
+
 #include <iomanip>
 #include <iostream>
 #include <valarray>
@@ -75,10 +83,3 @@ int main() {
 
     return 0;
 }
-
-/*
-plot \
-"C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/results/wyniki_1_lab_2.txt" using 1:2 with lines title "log10(x) od log10(error)", \
-"C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/results/wyniki_2_lab_2.txt" using 1:2 with lines title "log10(x) od log10(alt_error)", \
--16 with lines lc rgb "red" title "Blad reprezentacji"
-*/
