@@ -41,7 +41,7 @@ int main() {
 
 void newton(double x, double y, double z) {
     std::cout << "----------------------------------- Newton -----------------------------------" << std::endl;
-    std::printf("%-4s%-15s%-15s%-15s%-15s%-15s\n", "i", "Wartosc x", "Wartosc y", "Wartosc z", "Estymator", "Residuum");
+    std::printf("%-4s%-15s%-15s%-16s%-15s%-15s\n", "i", "Wartosc x", "Wartosc y", "Wartosc z", "Estymator", "Residuum");
 
     for (int i = 1; i <= N_MAX; i++) {
         double J[3][3] = {

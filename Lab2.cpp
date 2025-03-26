@@ -22,28 +22,27 @@
 #include <string>
 #include <cmath>
 
-double function(double x) {
-    return x * x * x / (6.0 * (std::sinh(x) - x));
+long double function(long double x) {
+    return x * x * x / (6.0L * (std::sinhl(x) - x));
 }
 
-double relative_error(double accurate, double approximate) {
-    return std::fabs(approximate - accurate) / accurate;
+long double relative_error(long double accurate, long double approximate) {
+    return std::fabsl(approximate - accurate) / accurate;
 }
 
-double sin_h(double x) {
-    double result = 0.0;
-    double temp = x;
+long double sin_h(long double x) {
+    long double sum = 0.0L;
+    long double term = x;
 
     for (int n = 1; n < 1000; n++) {
-        result += temp;
-        temp *= x / (double) (2 * n);
+        sum += term;
+        term *= (x * x) / ((2.0L * n) * (2.0L * n + 1));
     }
-
-    return result;
+    return sum;
 }
 
-double alternative_function(double x) {
-    return x * x * x / (6.0 * (sin_h(x) - x));
+long double alternative_function(long double x) {
+    return x * x * x / (6.0L * (sin_h(x) - x));
 }
 
 int main() {
@@ -58,14 +57,14 @@ int main() {
     std::string line;
     for (int i = 0; i < 3; i++) std::getline(input, line);
 
-    double log_x, x, result;
+    long double log_x, x, result;
     while (input >> log_x >> x >> result) {
         // std::printf("%.5f %.20e %.20f\n", log_x, x, result);
-        double log_error = std::log10(relative_error(result, function(x)));
+        long double log_error = std::log10l(relative_error(result, function(x)));
         output_1 << std::fixed << std::setprecision(5) << log_x << " ";
         output_1 << std::scientific << std::setprecision(20) << log_error << std::endl;
 
-        double log_error_alt = std::log10(relative_error(result, alternative_function(x)));
+        long double log_error_alt = std::log10l(relative_error(result, alternative_function(x)));
         output_2 << std::fixed << std::setprecision(5) << log_x << " ";
         output_2 << std::scientific << std::setprecision(20) << log_error_alt << std::endl;
     }
