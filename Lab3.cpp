@@ -90,7 +90,7 @@ void picard(const std::function<double(double)> &f, const std::function<double(d
 
         std::printf("%-3d %-10.12f   %-10.12f   %-10.12f\n", i, x_1, estimator, residuum);
 
-        if (estimator < TOLX || residuum < TOLF) break;
+        if (estimator < TOLX && residuum < TOLF) break;
 
         x_0 = x_1;
     }
@@ -108,10 +108,12 @@ void bisection(double a, double b, const std::function<double(double)> &f) {
 
         std::printf("%-3d %-10.12f   %-10.12f   %-10.12f\n", i, x_n, estimator, residuum);
 
-        if (estimator < TOLX || residuum < TOLF) break;
+        if (estimator < TOLX && residuum < TOLF) break;
 
-        if (f(a) * f(x_n) < 0) b = x_n;
-        else a = x_n;
+        if ((f(a) < 0 && f(x_n) > 0) || (f(a) > 0 && f(x_n) < 0))
+            b = x_n;
+        else
+            a = x_n;
     }
     std::cout << std::endl;
 }
@@ -127,7 +129,7 @@ void newton(double x_1, const std::function<double(double)> &f, const std::funct
 
         std::printf("%-3d %-10.12f   %-10.12f   %-10.12f\n", i, x_n, estimator, residuum);
 
-        if (estimator < TOLX || residuum < TOLF) break;
+        if (estimator < TOLX && residuum < TOLF) break;
 
         x_1 = x_n;
     }
@@ -145,7 +147,7 @@ void secant(double x_1, double x_2, const std::function<double(double)> &f) {
 
         std::printf("%-3d %-10.12f   %-10.12f   %-10.12f\n", i, x_n, estimator, residuum);
 
-        if (estimator < TOLX || residuum < TOLF) break;
+        if (estimator < TOLX && residuum < TOLF) break;
 
         x_1 = x_2;
         x_2 = x_n;
