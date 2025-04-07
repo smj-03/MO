@@ -19,4 +19,83 @@
 
 // Notatki
 // Nie używać A[i][j], zastosować pomocniczy wektor index[i]=i
-// A[index[i][j], b[index[i]][j]
+// A[index[i]][j], b[index[i]][j]
+
+#include <iostream>
+#include <math.h>
+
+#define N 5
+
+double A[N][N] =
+{
+    {5.0, 4.0, 3.0, 2.0, 1.0},
+    {10.0, 8.0, 7.0, 6.0, 5.0},
+    {-1.0, 2.0, -3.0, 4.0, -5.0},
+    {6.0, 5.0, -4.0, 3.0, -2.0},
+    {1.0, 2.0, 3.0, 4.0, 5.0}
+};
+
+double b[N] = {37.0, 99.0, -9.0, 12.0, 53.0};
+
+int index[N] = {0, 1, 2, 3, 4};
+
+double L[N][N] = {
+    {1.0, 0.0, 0.0, 0.0, 0.0},
+    {0.0, 1.0, 0.0, 0.0, 0.0},
+    {0.0, 0.0, 1.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0, 1.0, 0.0},
+    {0.0, 0.0, 0.0, 0.0, 1.0}
+};
+
+void lu_decomposition();
+
+void change_pivot(int);
+
+void gaussian_eliminaton();
+
+void print_matrix(double [N][N]);
+
+int main() {
+    print_matrix(A);
+    gaussian_eliminaton();
+    return 0;
+}
+
+void gaussian_eliminaton() {
+    for (int i = 0; i < N-1; i++) {
+        if (A[index[i]][i] == 0.0) change_pivot(i);
+        for (int k = i + 1; k < N; k++) {
+            double quotient = A[index[k]][i] / A[index[i]][i];
+            std::cout << quotient << std::endl;
+            for (int j = 0; j < N; j++) {
+                A[index[k]][j] -= A[index[i]][j] * quotient;
+            }
+        }
+        std::cout << "----------------" << std::endl;
+        print_matrix(A);
+    }
+}
+
+void lu_decomposition() {
+}
+
+void change_pivot(int i) {
+    double max = -INFINITY;
+    int max_i, temp_i;
+    for (int j = i + 1; j < N; j++)
+        if (A[index[j]][i] > max) {
+            max = A[index[j]][i];
+            max_i = j;
+        }
+    temp_i = index[i];
+    index[i] = max_i;
+    index[max_i] = temp_i;
+}
+
+void print_matrix(double M[N][N]) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++)
+            std::cout << M[index[i]][j] << " ";
+        std::cout << std::endl;
+    }
+}
