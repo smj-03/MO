@@ -22,52 +22,42 @@
 // A[index[i]][j], b[index[i]][j]
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #define N 5
 
-double A[N][N] =
-{
-    {5.0, 4.0, 3.0, 2.0, 1.0},
-    {10.0, 8.0, 7.0, 6.0, 5.0},
-    {-1.0, 2.0, -3.0, 4.0, -5.0},
-    {6.0, 5.0, -4.0, 3.0, -2.0},
-    {1.0, 2.0, 3.0, 4.0, 5.0}
-};
-
-double b[N] = {37.0, 99.0, -9.0, 12.0, 53.0};
-
 int index[N] = {0, 1, 2, 3, 4};
 
-double L[N][N] = {
-    {0.0, 0.0, 0.0, 0.0, 0.0},
-    {0.0, 0.0, 0.0, 0.0, 0.0},
-    {0.0, 0.0, 0.0, 0.0, 0.0},
-    {0.0, 0.0, 0.0, 0.0, 0.0},
-    {0.0, 0.0, 0.0, 0.0, 0.0}
-};
+void lu_decomposition(double [N][N], double [N][N]);
 
-double y[N] = {0.0, 0.0, 0.0, 0.0, 0.0};
+void change_pivot(double [N][N], int);
 
-double x[N] = {0.0, 0.0, 0.0, 0.0, 0.0};
-
-void lu_decomposition();
-
-void change_pivot(int);
-
-void solve_equation();
+void solve_equation(double [N][N], double [N][N], const double [N], double [N]);
 
 void print_matrix(double [N][N]);
 
 int main() {
-    lu_decomposition();
+    double A[N][N] =
+    {
+        {5.0, 4.0, 3.0, 2.0, 1.0},
+        {10.0, 8.0, 7.0, 6.0, 5.0},
+        {-1.0, 2.0, -3.0, 4.0, -5.0},
+        {6.0, 5.0, -4.0, 3.0, -2.0},
+        {1.0, 2.0, 3.0, 4.0, 5.0}
+    };
+
+    double b[N] = {37.0, 99.0, -9.0, 12.0, 53.0};
+
+    double L[N][N], x[N];
+
+    lu_decomposition(A, L);
     std::cout << "L MATRIX:" << std::endl;
     print_matrix(A);
     std::cout << std::endl;
 
     std::cout << "U MATRIX:" << std::endl;
     print_matrix(L);
-    solve_equation();
+    solve_equation(A, L, b, x);
     std::cout << std::endl;
 
     std::cout << "SOLUTION:" << std::endl;
@@ -75,34 +65,40 @@ int main() {
     return 0;
 }
 
-void lu_decomposition() {
+void lu_decomposition(double M[N][N], double L[N][N]) {
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++)
+            L[i][j] = 0;
+
     for (int i = 0; i < N - 1; i++) {
-        if (A[index[i]][i] == 0.0) change_pivot(i);
+        if (M[index[i]][i] == 0.0) change_pivot(M, i);
         for (int k = i + 1; k < N; k++) {
-            double quotient = A[index[k]][i] / A[index[i]][i];
+            double quotient = M[index[k]][i] / M[index[i]][i];
             L[k][i] = quotient;
             for (int j = 0; j < N; j++)
-                A[index[k]][j] -= A[index[i]][j] * quotient;
+                M[index[k]][j] -= M[index[i]][j] * quotient;
         }
     }
 
     for (int i = 0; i < N; i++) L[index[i]][i] = 1;
 }
 
-void change_pivot(int i) {
+void change_pivot(double M[N][N], const int i) {
     double max = -INFINITY;
-    int max_i, temp_i;
+    int max_i = i;
     for (int j = i + 1; j < N; j++)
-        if (A[index[j]][i] > max) {
-            max = A[index[j]][i];
+        if (M[index[j]][i] > max) {
+            max = M[index[j]][i];
             max_i = j;
         }
-    temp_i = index[i];
+    const int temp_i = index[i];
     index[i] = max_i;
     index[max_i] = temp_i;
 }
 
-void solve_equation() {
+void solve_equation(double U[N][N], double L[N][N], const double b[N], double x[N]) {
+    double y[N];
+
     for (int i = 0; i < N; i++) {
         double sum = 0.0;
         for (int j = 0; j < i; j++) sum += L[index[i]][j] * y[j];
@@ -111,15 +107,15 @@ void solve_equation() {
 
     for (int i = N - 1; i >= 0; i--) {
         double sum = 0.0;
-        for (int j = i + 1; j < N; j++) sum += A[index[i]][j] * x[j];
-        x[i] = (y[i] - sum) / A[index[i]][i];
+        for (int j = i + 1; j < N; j++) sum += U[index[i]][j] * x[j];
+        x[i] = (y[i] - sum) / U[index[i]][i];
     }
 }
 
 void print_matrix(double M[N][N]) {
-    for (int i = 0; i < N; i++) {
+    for (const int i : index) {
         for (int j = 0; j < N; j++)
-            printf("%5.2f ", M[index[i]][j]);
+            printf("%5.2f ", M[i][j]);
         std::cout << std::endl;
     }
 }
