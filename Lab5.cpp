@@ -46,7 +46,7 @@ int main() {
         {1.0, 2.0, 3.0, 4.0, 5.0}
     };
 
-    double b[N] = {37.0, 99.0, -9.0, 12.0, 53.0};
+    constexpr double b[N] = {37.0, 99.0, -9.0, 12.0, 53.0};
 
     double L[N][N], x[N];
 
@@ -68,19 +68,19 @@ int main() {
 void lu_decomposition(double M[N][N], double L[N][N]) {
     for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
-            L[i][j] = 0;
+            L[i][j] = 0.0;
 
     for (int i = 0; i < N - 1; i++) {
         if (M[index[i]][i] == 0.0) change_pivot(M, i);
         for (int k = i + 1; k < N; k++) {
-            double quotient = M[index[k]][i] / M[index[i]][i];
+            const double quotient = M[index[k]][i] / M[index[i]][i];
             L[k][i] = quotient;
             for (int j = 0; j < N; j++)
                 M[index[k]][j] -= M[index[i]][j] * quotient;
         }
     }
 
-    for (int i = 0; i < N; i++) L[index[i]][i] = 1;
+    for (int i = 0; i < N; i++) L[index[i]][i] = 1.0;
 }
 
 void change_pivot(double M[N][N], const int i) {
