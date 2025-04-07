@@ -28,7 +28,7 @@
 
 int index[N] = {0, 1, 2, 3, 4};
 
-void lu_decomposition(double [N][N], double [N][N]);
+void lu_decomposition(double [N][N], double [N][N], double [N][N]);
 
 void change_pivot(double [N][N], int);
 
@@ -48,35 +48,37 @@ int main() {
 
     constexpr double b[N] = {37.0, 99.0, -9.0, 12.0, 53.0};
 
-    double L[N][N], x[N];
+    double U[N][N], L[N][N], x[N];
 
-    lu_decomposition(A, L);
-    std::cout << "L MATRIX:" << std::endl;
-    print_matrix(A);
-    std::cout << std::endl;
-
+    lu_decomposition(A, U, L);
     std::cout << "U MATRIX:" << std::endl;
-    print_matrix(L);
-    solve_equation(A, L, b, x);
+    print_matrix(U);
     std::cout << std::endl;
 
+    std::cout << "L MATRIX:" << std::endl;
+    print_matrix(L);
+    std::cout << std::endl;
+
+    solve_equation(U, L, b, x);
     std::cout << "SOLUTION:" << std::endl;
-    for (int i = 0; i < N; i++) printf("x%d: %.2f\n", i, x[i]);
+    for (int i = 0; i < N; i++) printf("x%d: %.2f\n", i + 1, x[i]);
     return 0;
 }
 
-void lu_decomposition(double M[N][N], double L[N][N]) {
+void lu_decomposition(double M[N][N], double U[N][N], double L[N][N]) {
     for (int i = 0; i < N; i++)
-        for (int j = 0; j < N; j++)
+        for (int j = 0; j < N; j++) {
+            U[i][j] = M[i][j];
             L[i][j] = 0.0;
+        }
 
     for (int i = 0; i < N - 1; i++) {
-        if (M[index[i]][i] == 0.0) change_pivot(M, i);
+        if (U[index[i]][i] == 0.0) change_pivot(U, i);
         for (int k = i + 1; k < N; k++) {
-            const double quotient = M[index[k]][i] / M[index[i]][i];
+            const double quotient = U[index[k]][i] / U[index[i]][i];
             L[k][i] = quotient;
             for (int j = 0; j < N; j++)
-                M[index[k]][j] -= M[index[i]][j] * quotient;
+                U[index[k]][j] -= U[index[i]][j] * quotient;
         }
     }
 
@@ -113,7 +115,7 @@ void solve_equation(double U[N][N], double L[N][N], const double b[N], double x[
 }
 
 void print_matrix(double M[N][N]) {
-    for (const int i : index) {
+    for (const int i: index) {
         for (int j = 0; j < N; j++)
             printf("%5.2f ", M[i][j]);
         std::cout << std::endl;
