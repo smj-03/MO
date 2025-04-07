@@ -47,9 +47,15 @@ double L[N][N] = {
     {0.0, 0.0, 0.0, 0.0, 0.0}
 };
 
+double y[N] = {0.0, 0.0, 0.0, 0.0, 0.0};
+
+double x[N] = {0.0, 0.0, 0.0, 0.0, 0.0};
+
 void lu_decomposition();
 
 void change_pivot(int);
+
+void solve_equation();
 
 void print_matrix(double [N][N]);
 
@@ -57,8 +63,15 @@ int main() {
     lu_decomposition();
     std::cout << "L MATRIX:" << std::endl;
     print_matrix(A);
+    std::cout << std::endl;
+
     std::cout << "U MATRIX:" << std::endl;
     print_matrix(L);
+    solve_equation();
+    std::cout << std::endl;
+
+    std::cout << "SOLUTION:" << std::endl;
+    for (int i = 0; i < N; i++) printf("x%d: %.2f\n", i, x[i]);
     return 0;
 }
 
@@ -87,6 +100,20 @@ void change_pivot(int i) {
     temp_i = index[i];
     index[i] = max_i;
     index[max_i] = temp_i;
+}
+
+void solve_equation() {
+    for (int i = 0; i < N; i++) {
+        double sum = 0.0;
+        for (int j = 0; j < i; j++) sum += L[index[i]][j] * y[j];
+        y[i] = b[index[i]] - sum;
+    }
+
+    for (int i = N - 1; i >= 0; i--) {
+        double sum = 0.0;
+        for (int j = i + 1; j < N; j++) sum += A[index[i]][j] * x[j];
+        x[i] = (y[i] - sum) / A[index[i]][i];
+    }
 }
 
 void print_matrix(double M[N][N]) {
