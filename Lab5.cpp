@@ -40,43 +40,40 @@ double b[N] = {37.0, 99.0, -9.0, 12.0, 53.0};
 int index[N] = {0, 1, 2, 3, 4};
 
 double L[N][N] = {
-    {1.0, 0.0, 0.0, 0.0, 0.0},
-    {0.0, 1.0, 0.0, 0.0, 0.0},
-    {0.0, 0.0, 1.0, 0.0, 0.0},
-    {0.0, 0.0, 0.0, 1.0, 0.0},
-    {0.0, 0.0, 0.0, 0.0, 1.0}
+    {0.0, 0.0, 0.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0, 0.0, 0.0},
+    {0.0, 0.0, 0.0, 0.0, 0.0}
 };
 
 void lu_decomposition();
 
 void change_pivot(int);
 
-void gaussian_eliminaton();
-
 void print_matrix(double [N][N]);
 
 int main() {
+    lu_decomposition();
+    std::cout << "L MATRIX:" << std::endl;
     print_matrix(A);
-    gaussian_eliminaton();
+    std::cout << "U MATRIX:" << std::endl;
+    print_matrix(L);
     return 0;
 }
 
-void gaussian_eliminaton() {
-    for (int i = 0; i < N-1; i++) {
+void lu_decomposition() {
+    for (int i = 0; i < N - 1; i++) {
         if (A[index[i]][i] == 0.0) change_pivot(i);
         for (int k = i + 1; k < N; k++) {
             double quotient = A[index[k]][i] / A[index[i]][i];
-            std::cout << quotient << std::endl;
-            for (int j = 0; j < N; j++) {
+            L[k][i] = quotient;
+            for (int j = 0; j < N; j++)
                 A[index[k]][j] -= A[index[i]][j] * quotient;
-            }
         }
-        std::cout << "----------------" << std::endl;
-        print_matrix(A);
     }
-}
 
-void lu_decomposition() {
+    for (int i = 0; i < N; i++) L[index[i]][i] = 1;
 }
 
 void change_pivot(int i) {
@@ -95,7 +92,7 @@ void change_pivot(int i) {
 void print_matrix(double M[N][N]) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++)
-            std::cout << M[index[i]][j] << " ";
+            printf("%5.2f ", M[index[i]][j]);
         std::cout << std::endl;
     }
 }
