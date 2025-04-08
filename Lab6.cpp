@@ -20,7 +20,6 @@
 // Macierz A w postaci 3 wektorów z przekątnymi
 
 #include <iostream>
-#include <cmath>
 
 #define N 5
 
