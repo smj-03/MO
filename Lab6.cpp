@@ -38,7 +38,7 @@ int main() {
 
     double b[N] = {199.0, 195.0, 929.0, 954.0, 360.0};
 
-    double n[N], r[N], x[N] = {0.0, 0.0, 0.0, 0.0, 0.0};
+    double n[N], r[N], x[N];
 
     lu_decomposition_n(Ad, Al, Au, n);
     std::cout << "n VECTOR:" << std::endl;
