@@ -15,14 +15,6 @@
 * programu GNUPLOT (dostępnego za darmo z Internetu).
 */
 
-// Notatki
-/*
-plot \
-"C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/results/wyniki_1_lab_2.txt" using 1:2 with lines title "log10(x) od log10(error)", \
-"C:/Users/szymon.chwastek/Documents/C++/PK/MO/Zad_1/results/wyniki_2_lab_2.txt" using 1:2 with lines title "log10(x) od log10(alt_error)", \
--16 with lines lc rgb "red" title "Blad reprezentacji"
-*/
-
 #include <iomanip>
 #include <iostream>
 #include <valarray>
@@ -54,9 +46,9 @@ long double alternative_function(long double x) {
 }
 
 int main() {
-    std::ifstream input("../data/dane_do_laboratorium_2.txt");
-    std::ofstream output_1("../results/wyniki_1_lab_2.txt");
-    std::ofstream output_2("../results/wyniki_2_lab_2.txt");
+    std::ifstream input("../data/Lab2/dane.txt");
+    std::ofstream output_1("../data/Lab2/wyniki_1.txt");
+    std::ofstream output_2("../data/Lab2/wyniki_2.txt");
     if (!input || !output_1 || !output_2) {
         std::cerr << "Error: Blad przy otwieraniu pliku!" << std::endl;
         return 1;
