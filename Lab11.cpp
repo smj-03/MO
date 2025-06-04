@@ -1,22 +1,28 @@
 ﻿#include <iostream>
 #include <cmath>
 
-#define D 1.0
-#define A 0
-#define B 1
+#define A 0.0L
+#define B 1.0L
+#define D 1.0L
+#define H 0.05L
+#define DELTA_T 0.001L
 #define X_NUM 1000
 
-double analytical_solution(double, double);
+double analytical_solution(const long double x, const long double t) {
+    return (1.0 - std::expl(-std::numbers::pi * std::numbers::pi * D * t)) * std::sinl(std::numbers::pi * x);
+}
 
-void linear_space(double, double, int, double *);
+void linear_space(long double, long double, int, long double *);
+
+void finite_difference_method(long double, long double, long double);
 
 int main() {
     std::cout << analytical_solution(0.5, 0.2);
-    double space[X_NUM];
+    long double space[X_NUM];
     linear_space(A, B, X_NUM, space);
 
     FILE *file = fopen("../data/Lab11/wykres_analityczny", "w");
-    constexpr double t_values[] = {0.0, 0.1, 0.2, 0.3, 0.4, 0.5};
+    constexpr long double t_values[] = {0.0L, 0.1L, 0.2L, 0.3L, 0.4L, 0.5L};
     constexpr int t_count = std::size(t_values);
     for (int i = 0; i < X_NUM; i++) {
         fprintf(file, "%.6fe", space[i]);
@@ -28,17 +34,17 @@ int main() {
     return 0;
 }
 
-double analytical_solution(const double x, const double t) {
-    return (1.0 - std::exp(-std::numbers::pi * std::numbers::pi * D * t)) * std::sin(std::numbers::pi * x);
+double finite_difference_method(double u) {
 }
 
-void linear_space(double a, double b, int n, double *output) {
+
+void linear_space(const long double a, const long double b, const int n, long double *output) {
     if (n <= 0) return;
     if (n == 1) {
         output[0] = n;
         return;
     }
 
-    double step = (b - a) / (static_cast<double>(n) - 1.0);
+    const long double step = (b - a) / (static_cast<long double>(n) - 1.0);
     for (int i = 0; i < n; i++) output[i] = a + i * step;
 }
