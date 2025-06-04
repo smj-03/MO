@@ -1,0 +1,7 @@
+set title "Rozwiazanie Analityczne"
+set xlabel "x"
+set ylabel "U(x, t)"
+set grid
+set key outside
+
+plot for [i=2:7] "data/Lab11/wykres_analityczny" using 1:i with lines title sprintf("t=%.1f", (i-2)*0.1)

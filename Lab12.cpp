@@ -11,8 +11,8 @@
 
 #define A -1
 #define B 1
-#define N 100
-#define X_NUM 1000
+#define N 60
+#define X_NUM 10000
 
 double function(double);
 
