@@ -22,7 +22,7 @@ set grid
 set key outside
 plot for [i=2:7] "data/Lab11/wykres_numeryczny_laasonen_thomas" using 1:i with lines title sprintf("t=%.1f", (i-2)*0.1)
 
-set term qt 2
+set term qt 3
 set title "Rozwiazanie Numeryczne LU"
 set xlabel "x"
 set ylabel "U(x, t)"

@@ -128,7 +128,7 @@ void implicit_method_thomas(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]) {
     lower[N - 2] = 0.0L;
     for (int i = 1; i < N - 1; ++i) diagonal[i] = diagonal_value;
     for (int i = 0; i < N - 2; ++i) lower[i] = lambda;
-    for (int i = 0; i < N - 1; ++i) upper[i] = lambda;
+    for (int i = 1; i < N - 1; ++i) upper[i] = lambda;
 
     for (int t = 1; t < T_NUM_IMPLICIT; t++) {
         long double d[N], b[N], x[N];
