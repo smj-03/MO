@@ -66,6 +66,42 @@ Matrix explicit_method(const long double h) {
     return u;
 }
 
+Matrix implicit_method_thomas(const long double h) {
+    const long double dt = LAMBDA_IMPLICIT * h * h / D;
+    const int x_num = static_cast<int>((X_B - X_A) / h) + 1;
+    const int t_num = static_cast<int>(T_MAX / dt) + 1;
+
+    Matrix u(t_num, Vector(x_num, 0.0L));
+
+    constexpr long double diagonal_value = -(1.0L + 2.0L * LAMBDA_IMPLICIT);
+    long double diagonal[x_num], lower[x_num - 1], upper[x_num - 1];
+    diagonal[0] = 1.0L;
+    upper[0] = 0.0L;
+    diagonal[x_num - 1] = 1.0L;
+    lower[x_num - 2] = 0.0L;
+    for (int i = 1; i < x_num - 1; ++i) diagonal[i] = diagonal_value;
+    for (int i = 0; i < x_num - 2; ++i) lower[i] = LAMBDA_IMPLICIT;
+    for (int i = 1; i < x_num - 1; ++i) upper[i] = LAMBDA_IMPLICIT;
+
+    for (int t = 1; t < t_num; t++) {
+        long double d[x_num], b[x_num], x[x_num];
+        for (int i = 0; i < x_num; ++i) d[i] = diagonal[i];
+
+        b[0] = 0.0L;
+        b[x_num - 1] = 0.0L;
+        for (int i = 1; i < x_num - 1; ++i) {
+            const long double x_i = X_A + i * h;
+            const long double source_term = dt * D * PI * PI * std::sin(PI * x_i);
+            b[i] = -u[t - 1][i] - source_term;
+        };
+
+        thomas_algorithm(d, lower, upper, b, x, x_num);
+        for (int i = 0; i < x_num; ++i) u[t][i] = x[i];
+    }
+
+    return u;
+}
+
 void implicit_method_thomas(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]);
 
 void implicit_method_lu(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]);
@@ -76,45 +112,13 @@ int main() {
     std::ofstream f_explicit("../data/Lab11/errors_explicit.txt");
     f_explicit << std::scientific << std::setprecision(precision);
 
-    for (long double h = 0.005; h < T_MAX-0.1; h += 0.0001) {
+    for (long double h = 0.005; h < T_MAX - 0.1; h += 0.0001) {
         Matrix u_explicit = explicit_method(h);
         const long double err_explicit = calculate_max_error(u_explicit, h);
         f_explicit << h << "\t" << err_explicit << std::endl;
     }
 
     return 0;
-}
-
-void implicit_method_thomas(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]) {
-    constexpr long double lambda = D * DT_IMPLICIT / (DX_IMPLICIT * DX_IMPLICIT);
-    constexpr int N = X_NUM_IMPLICIT;
-    constexpr long double diagonal_value = -(1.0L + 2.0L * lambda);
-
-    long double diagonal[N], lower[N - 1], upper[N - 1];
-    diagonal[0] = 1.0L;
-    upper[0] = 0.0L;
-    diagonal[N - 1] = 1.0L;
-    lower[N - 2] = 0.0L;
-    for (int i = 1; i < N - 1; ++i) diagonal[i] = diagonal_value;
-    for (int i = 0; i < N - 2; ++i) lower[i] = lambda;
-    for (int i = 1; i < N - 1; ++i) upper[i] = lambda;
-
-    for (int t = 1; t < T_NUM_IMPLICIT; t++) {
-        long double d[N], b[N], x[N];
-        for (int i = 0; i < N; ++i) d[i] = diagonal[i];
-
-        b[0] = 0.0L;
-        b[N - 1] = 0.0L;
-        for (int i = 1; i < N - 1; ++i) {
-            const long double x_i = X_A + i * DX_IMPLICIT;
-            const long double source_term = D * DT_IMPLICIT * std::numbers::pi * std::numbers::pi * sinl(
-                                                std::numbers::pi * x_i);
-            b[i] = -u[t - 1][i] - source_term;
-        };
-
-        thomas_algorithm(d, lower, upper, b, x, N);
-        for (int i = 0; i < N; ++i) u[t][i] = x[i];
-    }
 }
 
 void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
@@ -126,9 +130,7 @@ void thomas_algorithm(long double *d, const long double *l, const long double *u
     }
 
     x[n - 1] = b[n - 1] / d[n - 1];
-    for (int i = n - 2; i >= 0; i--) {
-        x[i] = (b[i] - u[i] * x[i + 1]) / d[i];
-    }
+    for (int i = n - 2; i >= 0; i--) x[i] = (b[i] - u[i] * x[i + 1]) / d[i];
 }
 
 void implicit_method_lu(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]) {
