@@ -1,4 +1,6 @@
 ﻿#include <iostream>
+#include <iomanip>
+#include <fstream>
 #include <cmath>
 #include <vector>
 
@@ -14,7 +16,6 @@ constexpr long double X_B = 1.0L;
 
 constexpr long double LAMBDA_EXPLICIT = 0.4L;
 constexpr long double LAMBDA_IMPLICIT = 1.0L;
-
 
 /**
  * PARAMETRY DLA METODY KMB
@@ -33,6 +34,15 @@ constexpr long double LAMBDA_IMPLICIT = 1.0L;
 #define X_NUM_IMPLICIT static_cast<int>((X_B - X_A) / DX_IMPLICIT) + 1
 
 #define X_NUM 1000
+
+void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
+                      int n);
+
+void lu_decomposition(long double M[X_NUM_IMPLICIT][X_NUM_IMPLICIT], int n);
+
+void solve_lu_equation(long double M[X_NUM_IMPLICIT][X_NUM_IMPLICIT], long double *b, int n);
+
+long double calculate_max_error(const Matrix &u_matrix, long double h);
 
 long double analytical_solution(const long double x, const long double t) {
     return (1.0L - std::exp(-PI * PI * D * t)) * std::sin(PI * x);
@@ -56,77 +66,21 @@ Matrix explicit_method(const long double h) {
     return u;
 }
 
-void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
-                      int n);
-
-void lu_decomposition(long double M[X_NUM_IMPLICIT][X_NUM_IMPLICIT], int n);
-
-void solve_lu_equation(long double M[X_NUM_IMPLICIT][X_NUM_IMPLICIT], long double *b, int n);
-
 void implicit_method_thomas(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]);
 
 void implicit_method_lu(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]);
 
-void linear_space(long double a, long double b, int n, long double *output);
-
 int main() {
-    long double space[X_NUM];
-    linear_space(X_A, X_B, X_NUM, space);
+    constexpr int precision = 16;
 
-    FILE *file1 = fopen("../data/Lab11/wykres_analityczny", "w");
-    constexpr long double t_values[] = {0.0L, 0.1L, 0.2L, 0.3L, 0.4L, 0.5L};
-    constexpr int t_count = std::size(t_values);
-    for (int i = 0; i < X_NUM; i++) {
-        fprintf(file1, "%.12LE", space[i]);
-        for (int j = 0; j < t_count; j++)
-            fprintf(file1, "\t%.12LE", analytical_solution(space[i], t_values[j]));
-        fprintf(file1, "\n");
+    std::ofstream f_explicit("../data/Lab11/errors_explicit.txt");
+    f_explicit << std::scientific << std::setprecision(precision);
+
+    for (long double h = 0.005; h < T_MAX-0.1; h += 0.0001) {
+        Matrix u_explicit = explicit_method(h);
+        const long double err_explicit = calculate_max_error(u_explicit, h);
+        f_explicit << h << "\t" << err_explicit << std::endl;
     }
-    fclose(file1);
-
-    const Matrix u_explicit = explicit_method(0.05L);
-
-    FILE *file2 = fopen("../data/Lab11/wykres_numeryczny", "w");
-    for (int i = 0; i < X_NUM_EXPLICIT; i++) {
-        const long double xi = X_A + i * DX_EXPLICIT;
-        fprintf(file2, "%.12LE", xi);
-        for (int j = 0; j < t_count; j++) {
-            const int t_index = static_cast<int>(t_values[j] / DT_EXPLICIT);
-            fprintf(file2, "\t%.12LE", u_explicit[t_index][i]);
-        }
-        fprintf(file2, "\n");
-    }
-    fclose(file2);
-
-    long double u_implicit_thomas[T_NUM_IMPLICIT][X_NUM_IMPLICIT] = {0.0};
-    implicit_method_thomas(u_implicit_thomas);
-
-    FILE *file3 = fopen("../data/Lab11/wykres_numeryczny_laasonen_thomas", "w");
-    for (int i = 0; i < X_NUM_IMPLICIT; i++) {
-        const long double xi = X_A + i * DX_IMPLICIT;
-        fprintf(file3, "%.12LE", xi);
-        for (int j = 0; j < t_count; j++) {
-            const int t_index = static_cast<int>(t_values[j] / DT_IMPLICIT);
-            fprintf(file3, "\t%.12LE", u_implicit_thomas[t_index][i]);
-        }
-        fprintf(file3, "\n");
-    }
-    fclose(file3);
-
-    long double u_implicit_lu[T_NUM_IMPLICIT][X_NUM_IMPLICIT] = {0.0};
-    implicit_method_lu(u_implicit_lu);
-
-    FILE *file4 = fopen("../data/Lab11/wykres_numeryczny_laasonen_lu", "w");
-    for (int i = 0; i < X_NUM_IMPLICIT; i++) {
-        const long double xi = X_A + i * DX_IMPLICIT;
-        fprintf(file4, "%.12LE", xi);
-        for (int j = 0; j < t_count; j++) {
-            const int t_index = static_cast<int>(t_values[j] / DT_IMPLICIT);
-            fprintf(file4, "\t%.12LE", u_implicit_lu[t_index][i]);
-        }
-        fprintf(file4, "\n");
-    }
-    fclose(file4);
 
     return 0;
 }
@@ -239,13 +193,18 @@ void solve_lu_equation(long double M[X_NUM_IMPLICIT][X_NUM_IMPLICIT], long doubl
     }
 }
 
-void linear_space(const long double a, const long double b, const int n, long double *output) {
-    if (n <= 0) return;
-    if (n == 1) {
-        output[0] = n;
-        return;
+long double calculate_max_error(const Matrix &u_matrix, const long double h) {
+    const Vector &final_u = u_matrix.back();
+    const int x_num = final_u.size();
+
+    long double max_error = 0.0L;
+
+    for (int i = 0; i < x_num; i++) {
+        const long double x_i = X_A + i * h;
+        const long double numerical_val = final_u[i];
+        const long double analytical_val = analytical_solution(x_i, T_MAX);
+        max_error = std::max(max_error, std::abs(numerical_val - analytical_val));
     }
 
-    const long double step = (b - a) / (static_cast<long double>(n) - 1.0);
-    for (int i = 0; i < n; i++) output[i] = a + i * step;
+    return max_error;
 }
