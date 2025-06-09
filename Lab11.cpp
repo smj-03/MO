@@ -1,10 +1,20 @@
 ﻿#include <iostream>
 #include <cmath>
+#include <vector>
 
-#define T_MAX 1
-#define X_A 0.0L
-#define X_B 1.0L
-#define D 1.0L
+using Vector = std::vector<long double>;
+using Matrix = std::vector<Vector>;
+
+constexpr long double PI = std::numbers::pi_v<long double>;
+
+constexpr long double T_MAX = 1.0L;
+constexpr long double D = 1.0L;
+constexpr long double X_A = 0.0L;
+constexpr long double X_B = 1.0L;
+
+constexpr long double LAMBDA_EXPLICIT = 0.4L;
+constexpr long double LAMBDA_IMPLICIT = 1.0L;
+
 
 /**
  * PARAMETRY DLA METODY KMB
@@ -25,10 +35,26 @@
 #define X_NUM 1000
 
 long double analytical_solution(const long double x, const long double t) {
-    return (1.0L - std::expl(-std::numbers::pi * std::numbers::pi * D * t)) * std::sinl(std::numbers::pi * x);
+    return (1.0L - std::exp(-PI * PI * D * t)) * std::sin(PI * x);
 }
 
-void explicit_method(long double u[T_NUM_EXPLICIT][X_NUM_EXPLICIT]);
+Matrix explicit_method(const long double h) {
+    const long double dt = LAMBDA_EXPLICIT * h * h / D;
+    const int x_num = static_cast<int>((X_B - X_A) / h) + 1;
+    const int t_num = static_cast<int>(T_MAX / dt) + 1;
+
+    Matrix u(t_num, Vector(x_num, 0.0L));
+
+    for (int k = 0; k < t_num - 1; k++)
+        for (int i = 1; i < x_num - 1; i++) {
+            const long double x_i = X_A + i * h;
+            const long double source_term = dt * D * PI * PI * std::sin(PI * x_i);
+            u[k + 1][i] = LAMBDA_EXPLICIT * u[k][i - 1] + (1.0L - 2.0L * LAMBDA_EXPLICIT) * u[k][i] + LAMBDA_EXPLICIT *
+                          u[k][i + 1] + source_term;
+        }
+
+    return u;
+}
 
 void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
                       int n);
@@ -58,8 +84,7 @@ int main() {
     }
     fclose(file1);
 
-    long double u_explicit[T_NUM_EXPLICIT][X_NUM_EXPLICIT] = {0.0};
-    explicit_method(u_explicit);
+    const Matrix u_explicit = explicit_method(0.05L);
 
     FILE *file2 = fopen("../data/Lab11/wykres_numeryczny", "w");
     for (int i = 0; i < X_NUM_EXPLICIT; i++) {
@@ -104,16 +129,6 @@ int main() {
     fclose(file4);
 
     return 0;
-}
-
-void explicit_method(long double u[T_NUM_EXPLICIT][X_NUM_EXPLICIT]) {
-    constexpr long double lambda = D * DT_EXPLICIT / (DX_EXPLICIT * DX_EXPLICIT);
-    for (int k = 0; k < T_NUM_EXPLICIT - 1; k++)
-        for (int i = 1; i < X_NUM_EXPLICIT - 1; i++) {
-            const long double x_i = X_A + i * DX_EXPLICIT;
-            u[k + 1][i] = lambda * u[k][i - 1] + (1.0L - 2.0L * lambda) * u[k][i] + lambda * u[k][i + 1] +
-                          DT_EXPLICIT * D * std::numbers::pi * std::numbers::pi * std::sinl(std::numbers::pi * x_i);
-        }
 }
 
 void implicit_method_thomas(long double u[T_NUM_IMPLICIT][X_NUM_IMPLICIT]) {
