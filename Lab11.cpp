@@ -129,7 +129,6 @@ int main() {
     constexpr long double X_NUM_IMPLICIT = static_cast<int>((X_B - X_A) / DX_IMPLICIT) + 1;
 
     constexpr long double t_values[] = {0.0L, 0.1L, 0.2L, 0.3L, 0.4L, 0.5L};
-    constexpr int t_count = std::size(t_values);
 
     const Matrix u_explicit = explicit_method(DX_EXPLICIT);
 
@@ -137,8 +136,8 @@ int main() {
     for (int i = 0; i < X_NUM_EXPLICIT; i++) {
         const long double xi = X_A + i * DX_EXPLICIT;
         fprintf(file2, "%.12LE", xi);
-        for (int j = 0; j < t_count; j++) {
-            const int t_index = static_cast<int>(t_values[j] / DT_EXPLICIT);
+        for (const long double t_value: t_values) {
+            const int t_index = static_cast<int>(t_value / DT_EXPLICIT);
             fprintf(file2, "\t%.12LE", u_explicit[t_index][i]);
         }
         fprintf(file2, "\n");
@@ -151,8 +150,8 @@ int main() {
     for (int i = 0; i < X_NUM_IMPLICIT; i++) {
         const long double xi = X_A + i * DX_IMPLICIT;
         fprintf(file3, "%.12LE", xi);
-        for (int j = 0; j < t_count; j++) {
-            const int t_index = static_cast<int>(t_values[j] / DT_IMPLICIT);
+        for (const long double t_value: t_values) {
+            const int t_index = static_cast<int>(t_value / DT_IMPLICIT);
             fprintf(file3, "\t%.12LE", u_implicit_thomas[t_index][i]);
         }
         fprintf(file3, "\n");
@@ -165,8 +164,8 @@ int main() {
     for (int i = 0; i < X_NUM_IMPLICIT; i++) {
         const long double xi = X_A + i * DX_IMPLICIT;
         fprintf(file4, "%.12LE", xi);
-        for (int j = 0; j < t_count; j++) {
-            const int t_index = static_cast<int>(t_values[j] / DT_IMPLICIT);
+        for (const long double t_value: t_values) {
+            const int t_index = static_cast<int>(t_value / DT_IMPLICIT);
             fprintf(file4, "\t%.12LE", u_implicit_lu[t_index][i]);
         }
         fprintf(file4, "\n");
@@ -190,7 +189,7 @@ int main() {
 }
 
 void thomas_algorithm(Vector d, const Vector &l, const Vector &u, Vector &b, Vector &x) {
-    const int n = d.size();
+    const int n = static_cast<int>(d.size());
     if (n == 0) return;
 
     for (int i = 1; i < n; i++) {
@@ -204,7 +203,7 @@ void thomas_algorithm(Vector d, const Vector &l, const Vector &u, Vector &b, Vec
 }
 
 void lu_decomposition(Matrix &M) {
-    const int n = M.size();
+    const int n = static_cast<int>(M.size());
     if (n == 0) return;
 
     for (int i = 0; i < n - 1; i++) {
@@ -218,7 +217,7 @@ void lu_decomposition(Matrix &M) {
 }
 
 void solve_lu_equation(const Matrix &M, Vector &b) {
-    const int n = b.size();
+    const int n = static_cast<int>(b.size());
     long double y[n];
 
     for (int i = 0; i < n; i++) {
@@ -236,7 +235,7 @@ void solve_lu_equation(const Matrix &M, Vector &b) {
 
 long double calculate_max_error(const Matrix &u, const long double h) {
     const Vector &final_u = u.back();
-    const int x_num = final_u.size();
+    const int x_num = static_cast<int>(final_u.size());
 
     long double max_error = 0.0L;
 
