@@ -29,6 +29,11 @@ long double analytical_solution(const long double x, const long double t) {
     return (1.0L - std::exp(-PI * PI * D * t)) * std::sin(PI * x);
 }
 
+long double source_term(const long double dt, const long double h, const int i) {
+    const long double x_i = X_A + i * h;
+    return dt * D * PI * PI * std::sin(PI * x_i);
+}
+
 Matrix explicit_method(const long double h) {
     const long double dt = LAMBDA_EXPLICIT * h * h / D;
     const int x_num = static_cast<int>((X_B - X_A) / h) + 1;
@@ -37,12 +42,12 @@ Matrix explicit_method(const long double h) {
     Matrix u(t_num, Vector(x_num, 0.0L));
 
     for (int k = 0; k < t_num - 1; k++)
-        for (int i = 1; i < x_num - 1; i++) {
-            const long double x_i = X_A + i * h;
-            const long double source_term = dt * D * PI * PI * std::sin(PI * x_i);
-            u[k + 1][i] = LAMBDA_EXPLICIT * u[k][i - 1] + (1.0L - 2.0L * LAMBDA_EXPLICIT) * u[k][i] + LAMBDA_EXPLICIT *
-                          u[k][i + 1] + source_term;
-        }
+        for (int i = 1; i < x_num - 1; i++)
+            u[k + 1][i] =
+                    LAMBDA_EXPLICIT * u[k][i - 1] +
+                    (1.0L - 2.0L * LAMBDA_EXPLICIT) * u[k][i] +
+                    LAMBDA_EXPLICIT * u[k][i + 1] +
+                    source_term(dt, h, i);
 
     return u;
 }
@@ -70,11 +75,7 @@ Matrix implicit_method_thomas(const long double h) {
 
         b[0] = 0.0L;
         b[x_num - 1] = 0.0L;
-        for (int i = 1; i < x_num - 1; ++i) {
-            const long double x_i = X_A + i * h;
-            const long double source_term = dt * D * PI * PI * std::sin(PI * x_i);
-            b[i] = -u[t - 1][i] - source_term;
-        }
+        for (int i = 1; i < x_num - 1; ++i) b[i] = -u[t - 1][i] - source_term(dt, h, i);
 
         thomas_algorithm(diagonal, lower, upper, b, x);
         for (int i = 0; i < x_num; ++i) u[t][i] = x[i];
@@ -109,11 +110,7 @@ Matrix implicit_method_lu(const long double h) {
     for (int t = 1; t < t_num; t++) {
         b[0] = 0.0L;
         b[x_num - 1] = 0.0L;
-        for (int i = 1; i < x_num - 1; i++) {
-            const long double x_i = X_A + i * h;
-            const long double source_term = dt * D * PI * PI * std::sin(PI * x_i);
-            b[i] = -u[t - 1][i] - source_term;
-        }
+        for (int i = 1; i < x_num - 1; i++) b[i] = -u[t - 1][i] - source_term(dt, h, i);
 
         solve_lu_equation(A, b);
         for (int i = 0; i < x_num; i++) u[t][i] = b[i];
