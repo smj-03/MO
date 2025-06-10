@@ -17,24 +17,6 @@ constexpr long double X_B = 1.0L;
 constexpr long double LAMBDA_EXPLICIT = 0.4L;
 constexpr long double LAMBDA_IMPLICIT = 1.0L;
 
-/**
- * PARAMETRY DLA METODY KMB
- */
-#define DT_EXPLICIT 0.001L
-#define DX_EXPLICIT 0.05L
-#define T_NUM_EXPLICIT static_cast<int>(1 / DT_EXPLICIT) + 1
-#define X_NUM_EXPLICIT static_cast<int>((X_B - X_A) / DX_EXPLICIT) + 1
-
-/**
- * PARAMETRY DLA METODY LAASONEN
- */
-#define DT_IMPLICIT 0.0025L
-#define DX_IMPLICIT 0.05L
-#define T_NUM_IMPLICIT static_cast<int>(1 / DT_IMPLICIT) + 1
-#define X_NUM_IMPLICIT static_cast<int>((X_B - X_A) / DX_IMPLICIT) + 1
-
-#define X_NUM 1000
-
 void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
                       int n);
 
@@ -142,6 +124,14 @@ Matrix implicit_method_lu(const long double h) {
 }
 
 int main() {
+    constexpr long double DT_EXPLICIT = 0.001L;
+    constexpr long double DX_EXPLICIT = 0.05L;
+    constexpr long double X_NUM_EXPLICIT = static_cast<int>((X_B - X_A) / DX_EXPLICIT) + 1;
+
+    constexpr long double DT_IMPLICIT = 0.0025L;
+    constexpr long double DX_IMPLICIT = 0.05L;
+    constexpr long double X_NUM_IMPLICIT = static_cast<int>((X_B - X_A) / DX_IMPLICIT) + 1;
+
     constexpr long double t_values[] = {0.0L, 0.1L, 0.2L, 0.3L, 0.4L, 0.5L};
     constexpr int t_count = std::size(t_values);
 
