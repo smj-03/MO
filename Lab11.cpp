@@ -24,8 +24,6 @@ void lu_decomposition(Matrix &M);
 
 void solve_lu_equation(const Matrix &M, Vector &b);
 
-Real calculate_max_error(const Matrix &u, Real h);
-
 Real analytical_solution(const Real x, const Real t) {
     return (1.0L - std::exp(-PI * PI * D * t)) * std::sin(PI * x);
 }
@@ -37,8 +35,8 @@ Real source_term(const Real dt, const Real h, const int i) {
 
 Matrix explicit_method(const Real h) {
     const Real dt = LAMBDA_EXPLICIT * h * h / D;
-    const int x_num = static_cast<int>((X_B - X_A) / h) + 1;
-    const int t_num = static_cast<int>(T_MAX / dt) + 1;
+    const int x_num = static_cast<int>(std::round((X_B - X_A) / h)) + 1;
+    const int t_num = static_cast<int>(std::round(T_MAX / dt)) + 1;
 
     Matrix u(t_num, Vector(x_num, 0.0L));
 
@@ -56,8 +54,8 @@ Matrix explicit_method(const Real h) {
 Matrix implicit_method_thomas(const Real h) {
     const Real dt = LAMBDA_IMPLICIT * h * h / D;
     constexpr Real diagonal_value = -(1.0L + 2.0L * LAMBDA_IMPLICIT);
-    const int x_num = static_cast<int>((X_B - X_A) / h) + 1;
-    const int t_num = static_cast<int>(T_MAX / dt) + 1;
+    const int x_num = static_cast<int>(std::round((X_B - X_A) / h)) + 1;
+    const int t_num = static_cast<int>(std::round(T_MAX / dt)) + 1;
 
     Matrix u(t_num, Vector(x_num, 0.0L));
 
@@ -88,8 +86,8 @@ Matrix implicit_method_thomas(const Real h) {
 Matrix implicit_method_lu(const Real h) {
     const Real dt = LAMBDA_IMPLICIT * h * h / D;
     constexpr Real diagonal_value = -(1.0L + 2.0L * LAMBDA_IMPLICIT);
-    const int x_num = static_cast<int>((X_B - X_A) / h) + 1;
-    const int t_num = static_cast<int>(T_MAX / dt) + 1;
+    const int x_num = static_cast<int>(std::round((X_B - X_A) / h)) + 1;
+    const int t_num = static_cast<int>(std::round(T_MAX / dt)) + 1;
 
     Matrix u(t_num, Vector(x_num, 0.0L));
     Matrix A(x_num, Vector(x_num, 0.0L));
@@ -121,72 +119,36 @@ Matrix implicit_method_lu(const Real h) {
 }
 
 int main() {
-    constexpr Real DT_EXPLICIT = 0.001L;
-    constexpr Real DX_EXPLICIT = 0.05L;
-    constexpr Real X_NUM_EXPLICIT = static_cast<int>((X_B - X_A) / DX_EXPLICIT) + 1;
+    constexpr int precision = 16;
+    constexpr Real h = 0.05L;
+    constexpr Real dt = LAMBDA_EXPLICIT * h * h / D;
+    std::cout << dt << std::endl;
+    Vector t_values = {0.001L, 0.01L, 0.1L, 1.0L};
+    constexpr int x_num = static_cast<int>((X_B - X_A) / h) + 1;
 
-    constexpr Real DT_IMPLICIT = 0.0025L;
-    constexpr Real DX_IMPLICIT = 0.05L;
-    constexpr Real X_NUM_IMPLICIT = static_cast<int>((X_B - X_A) / DX_IMPLICIT) + 1;
+    std::ofstream file("../data/Lab11/explicit_values.txt");
+    file << std::scientific << std::setprecision(precision);
 
-    constexpr Real t_values[] = {0.0L, 0.1L, 0.2L, 0.3L, 0.4L, 0.5L};
+    // for (int i = 0; i <= 10000; i++) {
+    //     const Real x_i = X_A + i * 0.0001;
+    //     file << x_i;
+    //     for (const Real t: t_values) file << "\t" << analytical_solution(x_i, t);
+    //     file << std::endl;
+    // }
 
-    const Matrix u_explicit = explicit_method(DX_EXPLICIT);
-
-    FILE *file2 = fopen("../data/Lab11/wykres_numeryczny", "w");
-    for (int i = 0; i < X_NUM_EXPLICIT; i++) {
-        const Real xi = X_A + i * DX_EXPLICIT;
-        fprintf(file2, "%.12LE", xi);
-        for (const Real t_value: t_values) {
-            const int t_index = static_cast<int>(t_value / DT_EXPLICIT);
-            fprintf(file2, "\t%.12LE", u_explicit[t_index][i]);
+    Matrix u = explicit_method(h);
+    for (int i = 0; i < x_num; i++) {
+        const Real x_i = X_A + i * h;
+        file << x_i;
+        for (const Real t: t_values) {
+            const int t_index = static_cast<int>(std::round(t / dt));
+            std::cout << t_index << std::endl;
+            file << "\t" << u[t_index][i];
         }
-        fprintf(file2, "\n");
+        file << std::endl;
     }
-    fclose(file2);
-
-    const Matrix u_implicit_thomas = implicit_method_thomas(DX_IMPLICIT);
-
-    FILE *file3 = fopen("../data/Lab11/wykres_numeryczny_laasonen_thomas", "w");
-    for (int i = 0; i < X_NUM_IMPLICIT; i++) {
-        const Real xi = X_A + i * DX_IMPLICIT;
-        fprintf(file3, "%.12LE", xi);
-        for (const Real t_value: t_values) {
-            const int t_index = static_cast<int>(t_value / DT_IMPLICIT);
-            fprintf(file3, "\t%.12LE", u_implicit_thomas[t_index][i]);
-        }
-        fprintf(file3, "\n");
-    }
-    fclose(file3);
-
-    const Matrix u_implicit_lu = implicit_method_lu(DX_IMPLICIT);
-
-    FILE *file4 = fopen("../data/Lab11/wykres_numeryczny_laasonen_lu", "w");
-    for (int i = 0; i < X_NUM_IMPLICIT; i++) {
-        const Real xi = X_A + i * DX_IMPLICIT;
-        fprintf(file4, "%.12LE", xi);
-        for (const Real t_value: t_values) {
-            const int t_index = static_cast<int>(t_value / DT_IMPLICIT);
-            fprintf(file4, "\t%.12LE", u_implicit_lu[t_index][i]);
-        }
-        fprintf(file4, "\n");
-    }
-    fclose(file4);
 
     return 0;
-
-    // constexpr int precision = 16;
-    //
-    // std::ofstream f_explicit("../data/Lab11/errors_explicit.txt");
-    // f_explicit << std::scientific << std::setprecision(precision);
-    //
-    // for (Real h = 0.005; h < T_MAX - 0.1; h += 0.0001) {
-    //     Matrix u_explicit = explicit_method(h);
-    //     const Real err_explicit = calculate_max_error(u_explicit, h);
-    //     f_explicit << h << "\t" << err_explicit << std::endl;
-    // }
-    //
-    // return 0;
 }
 
 void thomas_algorithm(Vector d, const Vector &l, const Vector &u, Vector &b, Vector &x) {
@@ -232,20 +194,4 @@ void solve_lu_equation(const Matrix &M, Vector &b) {
         for (int j = i + 1; j < n; j++) sum += M[i][j] * b[j];
         b[i] = (y[i] - sum) / M[i][i];
     }
-}
-
-Real calculate_max_error(const Matrix &u, const Real h) {
-    const Vector &final_u = u.back();
-    const int x_num = static_cast<int>(final_u.size());
-
-    Real max_error = 0.0L;
-
-    for (int i = 0; i < x_num; i++) {
-        const Real x_i = X_A + i * h;
-        const Real numerical_val = final_u[i];
-        const Real analytical_val = analytical_solution(x_i, T_MAX);
-        max_error = std::max(max_error, std::abs(numerical_val - analytical_val));
-    }
-
-    return max_error;
 }
