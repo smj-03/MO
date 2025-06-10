@@ -38,9 +38,9 @@ constexpr long double LAMBDA_IMPLICIT = 1.0L;
 void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
                       int n);
 
-void lu_decomposition(Matrix M);
+void lu_decomposition(Matrix &M);
 
-void solve_lu_equation(const Matrix &M, Vector b);
+void solve_lu_equation(const Matrix &M, Vector &b);
 
 long double calculate_max_error(const Matrix &u, long double h);
 
@@ -125,33 +125,82 @@ Matrix implicit_method_lu(const long double h) {
 
     lu_decomposition(A);
 
-    for (int t = 1; t <= T_NUM_IMPLICIT; t++) {
-        for (int i = 1; i < x_num - 1; i++) {
-            const long double x_i = X_A + i * DX_IMPLICIT;
-            const long double source_term = D * DT_IMPLICIT * PI * PI * std::sin(PI * x_i);
-            b[i] = -u[t - 1][i] - source_term;
-        }
+    for (int t = 1; t < t_num; t++) {
         b[0] = 0.0L;
         b[x_num - 1] = 0.0L;
+        for (int i = 1; i < x_num - 1; i++) {
+            const long double x_i = X_A + i * h;
+            const long double source_term = dt * D * PI * PI * std::sin(PI * x_i);
+            b[i] = -u[t - 1][i] - source_term;
+        }
 
         solve_lu_equation(A, b);
         for (int i = 0; i < x_num; i++) u[t][i] = b[i];
     }
+
+    return u;
 }
 
 int main() {
-    constexpr int precision = 16;
+    constexpr long double t_values[] = {0.0L, 0.1L, 0.2L, 0.3L, 0.4L, 0.5L};
+    constexpr int t_count = std::size(t_values);
 
-    std::ofstream f_explicit("../data/Lab11/errors_explicit.txt");
-    f_explicit << std::scientific << std::setprecision(precision);
+    const Matrix u_explicit = explicit_method(DX_EXPLICIT);
 
-    for (long double h = 0.005; h < T_MAX - 0.1; h += 0.0001) {
-        Matrix u_explicit = explicit_method(h);
-        const long double err_explicit = calculate_max_error(u_explicit, h);
-        f_explicit << h << "\t" << err_explicit << std::endl;
+    FILE *file2 = fopen("../data/Lab11/wykres_numeryczny", "w");
+    for (int i = 0; i < X_NUM_EXPLICIT; i++) {
+        const long double xi = X_A + i * DX_EXPLICIT;
+        fprintf(file2, "%.12LE", xi);
+        for (int j = 0; j < t_count; j++) {
+            const int t_index = static_cast<int>(t_values[j] / DT_EXPLICIT);
+            fprintf(file2, "\t%.12LE", u_explicit[t_index][i]);
+        }
+        fprintf(file2, "\n");
     }
+    fclose(file2);
+
+    const Matrix u_implicit_thomas = implicit_method_thomas(DX_IMPLICIT);
+
+    FILE *file3 = fopen("../data/Lab11/wykres_numeryczny_laasonen_thomas", "w");
+    for (int i = 0; i < X_NUM_IMPLICIT; i++) {
+        const long double xi = X_A + i * DX_IMPLICIT;
+        fprintf(file3, "%.12LE", xi);
+        for (int j = 0; j < t_count; j++) {
+            const int t_index = static_cast<int>(t_values[j] / DT_IMPLICIT);
+            fprintf(file3, "\t%.12LE", u_implicit_thomas[t_index][i]);
+        }
+        fprintf(file3, "\n");
+    }
+    fclose(file3);
+
+    const Matrix u_implicit_lu = implicit_method_lu(DX_IMPLICIT);
+
+    FILE *file4 = fopen("../data/Lab11/wykres_numeryczny_laasonen_lu", "w");
+    for (int i = 0; i < X_NUM_IMPLICIT; i++) {
+        const long double xi = X_A + i * DX_IMPLICIT;
+        fprintf(file4, "%.12LE", xi);
+        for (int j = 0; j < t_count; j++) {
+            const int t_index = static_cast<int>(t_values[j] / DT_IMPLICIT);
+            fprintf(file4, "\t%.12LE", u_implicit_lu[t_index][i]);
+        }
+        fprintf(file4, "\n");
+    }
+    fclose(file4);
 
     return 0;
+
+    // constexpr int precision = 16;
+    //
+    // std::ofstream f_explicit("../data/Lab11/errors_explicit.txt");
+    // f_explicit << std::scientific << std::setprecision(precision);
+    //
+    // for (long double h = 0.005; h < T_MAX - 0.1; h += 0.0001) {
+    //     Matrix u_explicit = explicit_method(h);
+    //     const long double err_explicit = calculate_max_error(u_explicit, h);
+    //     f_explicit << h << "\t" << err_explicit << std::endl;
+    // }
+    //
+    // return 0;
 }
 
 void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
@@ -166,8 +215,10 @@ void thomas_algorithm(long double *d, const long double *l, const long double *u
     for (int i = n - 2; i >= 0; i--) x[i] = (b[i] - u[i] * x[i + 1]) / d[i];
 }
 
-void lu_decomposition(Matrix M) {
+void lu_decomposition(Matrix &M) {
     const int n = M.size();
+    if (n == 0) return;
+
     for (int i = 0; i < n - 1; i++) {
         for (int k = i + 1; k < n; k++) {
             const long double quotient = M[k][i] / M[i][i];
@@ -178,7 +229,7 @@ void lu_decomposition(Matrix M) {
     }
 }
 
-void solve_lu_equation(const Matrix &M, Vector b) {
+void solve_lu_equation(const Matrix &M, Vector &b) {
     const int n = b.size();
     long double y[n];
 
