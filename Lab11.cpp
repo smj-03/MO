@@ -17,8 +17,7 @@ constexpr long double X_B = 1.0L;
 constexpr long double LAMBDA_EXPLICIT = 0.4L;
 constexpr long double LAMBDA_IMPLICIT = 1.0L;
 
-void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
-                      int n);
+void thomas_algorithm(Vector d, const Vector &l, const Vector &u, Vector &b, Vector &x);
 
 void lu_decomposition(Matrix &M);
 
@@ -56,18 +55,18 @@ Matrix implicit_method_thomas(const long double h) {
 
     Matrix u(t_num, Vector(x_num, 0.0L));
 
-    long double diagonal[x_num], lower[x_num - 1], upper[x_num - 1];
+    Vector diagonal(x_num, diagonal_value);
     diagonal[0] = 1.0L;
-    upper[0] = 0.0L;
     diagonal[x_num - 1] = 1.0L;
+
+    Vector lower(x_num - 1, LAMBDA_IMPLICIT);
     lower[x_num - 2] = 0.0L;
-    for (int i = 1; i < x_num - 1; ++i) diagonal[i] = diagonal_value;
-    for (int i = 0; i < x_num - 2; ++i) lower[i] = LAMBDA_IMPLICIT;
-    for (int i = 1; i < x_num - 1; ++i) upper[i] = LAMBDA_IMPLICIT;
+
+    Vector upper(x_num - 1, LAMBDA_IMPLICIT);
+    upper[0] = 0.0L;
 
     for (int t = 1; t < t_num; t++) {
-        long double d[x_num], b[x_num], x[x_num];
-        for (int i = 0; i < x_num; ++i) d[i] = diagonal[i];
+        Vector b(x_num), x(x_num);
 
         b[0] = 0.0L;
         b[x_num - 1] = 0.0L;
@@ -75,9 +74,9 @@ Matrix implicit_method_thomas(const long double h) {
             const long double x_i = X_A + i * h;
             const long double source_term = dt * D * PI * PI * std::sin(PI * x_i);
             b[i] = -u[t - 1][i] - source_term;
-        };
+        }
 
-        thomas_algorithm(d, lower, upper, b, x, x_num);
+        thomas_algorithm(diagonal, lower, upper, b, x);
         for (int i = 0; i < x_num; ++i) u[t][i] = x[i];
     }
 
@@ -193,8 +192,10 @@ int main() {
     // return 0;
 }
 
-void thomas_algorithm(long double *d, const long double *l, const long double *u, long double *b, long double *x,
-                      const int n) {
+void thomas_algorithm(Vector d, const Vector &l, const Vector &u, Vector &b, Vector &x) {
+    const int n = d.size();
+    if (n == 0) return;
+
     for (int i = 1; i < n; i++) {
         const long double m = l[i - 1] / d[i - 1];
         d[i] = d[i] - m * u[i - 1];
